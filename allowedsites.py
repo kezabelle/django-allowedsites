@@ -5,13 +5,12 @@ class Sites(object):
     Sites are unordered, because seriously who cares.
     """
     
-    __slots__ = ('defaults', 'sites')
+    __slots__ = ('defaults',)
     
     def __init__(self, defaults=None):
         if defaults is None:
             defaults = ()
         self.defaults = frozenset(defaults)
-        self.sites = None
         
     def get_raw_sites(self):
         from django.contrib.sites.models import Site
@@ -28,14 +27,38 @@ class Sites(object):
     def __iter__(self):
         return iter(self.get_merged_allowed_hosts())
         
+    def __repr__(self):
+        return '<{mod}.{cls} for sites: {sites}'.format(
+            mod=self.__class__.__module__, cls=self.__class__.__name__,
+            sites=str(self))
+        
     def __str__(self):
         return ', '.join(self.get_merged_allowed_hosts())
         
+    __unicode__ = __str__
+        
     def __contains__(self, other):
-        return other in self.get_merged_allowed_hosts()
+        if other in self.defaults:
+            return True
+        if other in self.get_sites():
+            return True
+        return False
     
     def __len__(self):
         return len(self.get_merged_allowed_hosts())
+        
+    def __nonzero__(self):
+        # ask in order, so that a query *may* not be necessary.
+        if len(self.defaults) > 0:
+            return True
+        if len(self.get_sites()) > 0:
+            return True
+        return False
+        
+    __bool__ = __nonzero__
+        
+    def __eq__(self, other):
+        return self.defaults == other.defaults
         
     def __add__(self, other):
         more_defaults = self.defaults.union(other.defaults)
@@ -45,12 +68,13 @@ class Sites(object):
         less_defaults = self.defaults.difference(other.defaults)
         return self.__class__(defaults=less_defaults)
 
+
 class AllowedSites(Sites):
     """
     This only exists to allow isinstance to differentiate between
     the various Site subclasses
     """
-    __slots__ = ('defaults', 'sites')
+    __slots__ = ('defaults',)
     pass
 
 
@@ -61,7 +85,7 @@ class CachedAllowedSites(Sites):
     a signal listening for ``Site`` creates will be able to add to
     the cache's contents for other processes to pick up on.
     """
-    __slots__ = ('defaults', 'sites', 'key')
+    __slots__ = ('defaults', 'key')
     
     def __init__(self, defaults=None, key='allowedsites'):
         super(CachedAllowedSites, self).__init__(defaults=defaults)
