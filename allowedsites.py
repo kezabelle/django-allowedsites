@@ -43,7 +43,7 @@ class Sites(object):
         
     def __sub__(self, other):
         less_defaults = self.defaults.difference(other.defaults)
-        return self.__class__(defaults=more_defaults)
+        return self.__class__(defaults=less_defaults)
 
 class AllowedSites(Sites):
     """
