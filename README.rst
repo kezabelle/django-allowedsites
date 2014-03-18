@@ -21,3 +21,12 @@ You can modify the the defaults::
     ALLOWED_HOSTS += AllowedSites(defaults=('anothersite.net',))
     ALLOWED_HOSTS -= AllowedSites(defaults=('mytestsite.com',))
     # ultimately, only anothersite.net is in the defaults
+
+Other uses?
+-----------
+
+It *may* work with `django-csp`_ (Content Security Policy headers), 
+`django-dcors`_ (Cross-Origin Resource Sharing headers) and others. I don't know.
+
+.. _django-csp: https://github.com/mozilla/django-csp
+.. _django-dcors: https://github.com/prasanthn/django-dcors
