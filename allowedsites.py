@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 
 class Sites(object):
     """
@@ -18,7 +19,7 @@ class Sites(object):
         
     def get_sites(self):
         raw_sites = self.get_raw_sites()
-        self.sites = frozenset(site.domain for site in sites)
+        self.sites = frozenset(site.domain for site in raw_sites)
         return self.defaults.union(self.sites)
         
     def __iter__(self):
@@ -36,6 +37,10 @@ class Sites(object):
     def __add__(self, other):
         more_defaults = self.defaults.union(other.defaults)
         return self.__class__(defaults=more_defaults)
+        
+    def __sub__(self, other):
+        less_defaults = self.defaults.difference(other.defaults)
+        return self.__class__(defaults=more_defaults)
 
 class AllowedSites(Sites):
     """
@@ -47,6 +52,29 @@ class AllowedSites(Sites):
 
 
 class CachedAllowedSites(Sites):
-    __slots__ = ('defaults', 'sites')
-    pass
+    """
+    Sets the given ``Site`` domains into the ``default`` cache.
+    Expects the cache to be shared between processes, such that
+    a signal listening for ``Site`` creates will be able to add to
+    the cache's contents for other processes to pick up on.
+    """
+    __slots__ = ('defaults', 'sites', 'key')
+    
+    def __init__(self, defaults=None, key='allowedsites'):
+        super(CachedAllowedSites, self).__init__(defaults=defaults)
+        self.key = key
+    
+    def get_cached_sites(self):
+        from django.core.cache import cache
+        results = cache.get(self.key)
+        return results
+
+    def get_sites(self):
+        cached = self.get_cached_sites()
+        if cached is None:
+            # populates self.sites as a side-effect
+            super(CachedAllowedSites, self).get_sites()
+            cached = cache.set(self.key, self.sites)
+        return self.defaults.union(cached)
+            
 
