@@ -19,20 +19,23 @@ class Sites(object):
         
     def get_sites(self):
         raw_sites = self.get_raw_sites()
-        self.sites = frozenset(site.domain for site in raw_sites)
-        return self.defaults.union(self.sites)
+        return frozenset(site.domain for site in raw_sites)
+        
+    def get_merged_allowed_hosts(self):
+        sites = self.get_sites()
+        return self.defaults.union(sites)
         
     def __iter__(self):
-        return iter(self.get_sites())
+        return iter(self.get_merged_allowed_hosts())
         
     def __str__(self):
-        return ', '.join(self.get_sites())
+        return ', '.join(self.get_merged_allowed_hosts())
         
     def __contains__(self, other):
-        return other in self.get_sites()
+        return other in self.get_merged_allowed_hosts()
     
     def __len__(self):
-        return len(self.get_sites())
+        return len(self.get_merged_allowed_hosts())
         
     def __add__(self, other):
         more_defaults = self.defaults.union(other.defaults)
@@ -72,9 +75,10 @@ class CachedAllowedSites(Sites):
     def get_sites(self):
         cached = self.get_cached_sites()
         if cached is None:
-            # populates self.sites as a side-effect
-            super(CachedAllowedSites, self).get_sites()
-            cached = cache.set(self.key, self.sites)
-        return self.defaults.union(cached)
-            
-
+            cached = super(CachedAllowedSites, self).get_sites()
+            cache.set(self.key, cached)
+        return cached
+    
+    def get_merged_allowed_hosts(self):
+        sites = self.get_sites()
+        return self.defaults.union(sites)
