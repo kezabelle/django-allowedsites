@@ -14,6 +14,19 @@ Or, if you want to use your cache backend::
     from allowedsites import CachedAllowedSites
     ALLOWED_HOSTS = CachedAllowedSites()
     
+A single key, ``allowedsites`` will be inserted containing an unsorted collection 
+of all the domains that are in the ``django.contrib.sites``. For the sake of allowing
+multiple processes to keep up to date with the ``Site`` values without hitting 
+the database, using a shared cache (ie: not ``LocMemCache``) is encouraged.
+
+The ``CachedAllowedSites`` also provides an ``update_cache`` class method which
+may be used as a signal listener::
+
+    from django.db.models.signals import post_save
+    from django.contrib.sites.models import Site
+    post_save.connect(CachedAllowedSites.update_cache, sender=Site,
+                      dispatch_uid='update_allowedsites')
+    
 You can modify the the defaults::
 
     from allowedsites import AllowedSites
