@@ -28,7 +28,7 @@ class Sites(object):
         return iter(self.get_merged_allowed_hosts())
         
     def __repr__(self):
-        return '<{mod}.{cls} for sites: {sites}'.format(
+        return '<{mod}.{cls} for sites: {sites}>'.format(
             mod=self.__class__.__module__, cls=self.__class__.__name__,
             sites=str(self))
         
