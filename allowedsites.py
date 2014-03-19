@@ -91,23 +91,36 @@ class CachedAllowedSites(Sites):
     the cache's contents for other processes to pick up on.
     """
     __slots__ = ('defaults', 'key')
+    key = 'allowedsites'
     
-    def __init__(self, defaults=None, key='allowedsites'):
-        super(CachedAllowedSites, self).__init__(defaults=defaults)
-        self.key = key
+    def __init__(self, *args, **kwargs):
+        super(CachedAllowedSites, self).__init__(*args, **kwargs)
     
-    def get_cached_sites(self):
+    def _get_cached_sites(self):
         from django.core.cache import cache
-        results = cache.get(self.key)
+        results = cache.get(self.key, None)
         return results
 
-    def get_sites(self):
-        cached = self.get_cached_sites()
-        if cached is None:
-            cached = super(CachedAllowedSites, self).get_sites()
-            cache.set(self.key, cached)
-        return cached
-    
     def get_merged_allowed_hosts(self):
-        sites = self.get_sites()
+        sites = self._get_cached_sites()
+        if sites is None:
+            sites = self._set_cached_sites()
         return self.defaults.union(sites)
+        
+    def _set_cached_sites(self, **kwargs):
+        """
+        Forces whatever is in the DB into the cache.
+        """
+        from django.core.cache import cache
+        in_db = self.get_sites()
+        cache.set(self.key, in_db)
+        return in_db
+    
+    @classmethod
+    def update_cache(cls, **kwargs):
+        """
+        May be used as a post_save or post_delete signal listener.
+        Replaces whatever is in the cache with the sites in the DB
+        *at this moment*
+        """
+        cls()._set_cached_sites(**kwargs)
