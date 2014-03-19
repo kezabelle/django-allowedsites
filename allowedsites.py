@@ -58,8 +58,13 @@ class Sites(object):
     __bool__ = __nonzero__
         
     def __eq__(self, other):
-        return self.defaults == other.defaults
-        
+        # fail early.
+        if self.defaults != other.defaults:
+            return False
+        side_a = self.get_merged_allowed_hosts()
+        side_b = other.get_merged_allowed_hosts()
+        return side_a == side_b
+
     def __add__(self, other):
         more_defaults = self.defaults.union(other.defaults)
         return self.__class__(defaults=more_defaults)
