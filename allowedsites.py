@@ -91,9 +91,9 @@ class CachedAllowedSites(Sites):
     the cache's contents for other processes to pick up on.
     """
     __slots__ = ('defaults', 'key')
-    key = 'allowedsites'
     
     def __init__(self, *args, **kwargs):
+        self.key = 'allowedsites'
         super(CachedAllowedSites, self).__init__(*args, **kwargs)
     
     def _get_cached_sites(self):
