@@ -1,5 +1,11 @@
 # -*- coding: utf-8 -*-
 
+class ForceAllowedHostCheck(object):
+    def process_request(self, request):
+        request.get_host()
+        return None
+
+
 class Sites(object):
     """
     Sites are unordered, because seriously who cares.
