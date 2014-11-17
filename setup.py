@@ -32,6 +32,7 @@ setup(
     install_requires=[
         'Django>=1.4',
     ],
+    test_suite='runtests.runtests',
     zip_safe=False,
     license="BSD License",
     classifiers=[

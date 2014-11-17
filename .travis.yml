@@ -1,0 +1,19 @@
+language: python
+
+notifications:
+  email: false
+
+env:
+  - TOX_ENV=py26-1.6
+  - TOX_ENV=py27-1.6
+  - TOX_ENV=py27-1.7
+  - TOX_ENV=py33-1.6
+  - TOX_ENV=py33-1.7
+  - TOX_ENV=pypy-1.6
+  - TOX_ENV=pypy-1.7
+
+install:
+  - pip install --upgrade tox
+
+script:
+  - tox -e $TOX_ENV
