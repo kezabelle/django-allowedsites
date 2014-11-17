@@ -16,12 +16,12 @@ class Sites(object):
         from django.contrib.sites.models import Site
         return Site.objects.all().iterator()
         
-    def get_sites(self):
+    def get_domains(self):
         raw_sites = self.get_raw_sites()
         return frozenset(site.domain for site in raw_sites)
         
     def get_merged_allowed_hosts(self):
-        sites = self.get_sites()
+        sites = self.get_domains()
         return self.defaults.union(sites)
         
     def __iter__(self):
@@ -40,7 +40,7 @@ class Sites(object):
     def __contains__(self, other):
         if other in self.defaults:
             return True
-        if other in self.get_sites():
+        if other in self.get_domains():
             return True
         return False
     
@@ -51,7 +51,7 @@ class Sites(object):
         # ask in order, so that a query *may* not be necessary.
         if len(self.defaults) > 0:
             return True
-        if len(self.get_sites()) > 0:
+        if len(self.get_domains()) > 0:
             return True
         return False
         
@@ -80,7 +80,6 @@ class AllowedSites(Sites):
     the various Site subclasses
     """
     __slots__ = ('defaults',)
-    pass
 
 
 class CachedAllowedSites(Sites):
@@ -112,7 +111,7 @@ class CachedAllowedSites(Sites):
         Forces whatever is in the DB into the cache.
         """
         from django.core.cache import cache
-        in_db = self.get_sites()
+        in_db = self.get_domains()
         cache.set(self.key, in_db)
         return in_db
     
