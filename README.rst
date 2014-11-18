@@ -4,6 +4,9 @@ django-allowedsites
 
 Setting your ``ALLOWED_HOSTS`` based on the domains in ``django.contrib.sites``
 
+.. image:: https://travis-ci.org/kezabelle/django-allowedsites.svg?branch=master
+  :target: https://travis-ci.org/kezabelle/django-allowedsites
+
 Usage is something like the following, in your ``settings.py`` or equivalent::
 
     from allowedsites import AllowedSites
