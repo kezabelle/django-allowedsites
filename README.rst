@@ -2,7 +2,7 @@
 django-allowedsites
 ===================
 
-Setting your ``ALLOWED_HOSTS`` based on the domains in ``django.contrib.sites``
+Django 1.6+ library for setting your ``ALLOWED_HOSTS`` based on the domains in ``django.contrib.sites``
 
 .. image:: https://travis-ci.org/kezabelle/django-allowedsites.svg?branch=master
   :target: https://travis-ci.org/kezabelle/django-allowedsites
