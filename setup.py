@@ -36,7 +36,7 @@ setup(
     zip_safe=False,
     license="BSD License",
     classifiers=[
-        'Development Status :: 2 - Beta',
+        'Development Status :: 4 - Beta',
         'Intended Audience :: Developers',
         'License :: OSI Approved :: BSD License',
         'Framework :: Django',
